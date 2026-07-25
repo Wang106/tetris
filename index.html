@@ -41,7 +41,7 @@
       --title-size: clamp(1rem, 3.5vw, 1.5rem);
       --ctrl-size: 48px;
       --ctrl-gap: 6px;
-      --mini-cell: 2.4vh;
+      --mini-cell: 10px;
       --panel-val-size: 0.9rem;
     }
   }
@@ -52,7 +52,7 @@
       --panel-w: 46px;
       --ctrl-size: 42px;
       --ctrl-gap: 4px;
-      --mini-cell: 2.1vh;
+      --mini-cell: 8px;
       --panel-val-size: 0.8rem;
     }
   }
@@ -130,7 +130,10 @@
   .game-container {
     display: flex;
     gap: var(--game-gap);
-    align-items: flex-start;
+    align-items: stretch;
+    flex: 1 1 0;
+    width: 100%;
+    max-width: 480px;
   }
 
   /* --- Side Panels --- */
@@ -169,17 +172,17 @@
 
   .next-preview {
     display: grid;
-    grid-template-columns: repeat(4, var(--mini-cell, 18px));
-    grid-template-rows: repeat(4, var(--mini-cell, 18px));
-    gap: 2px;
+    grid-template-columns: repeat(4, var(--mini-cell, 12px));
+    grid-template-rows: repeat(4, var(--mini-cell, 12px));
+    gap: 1px;
     margin: 0 auto;
     width: fit-content;
   }
 
   .next-preview .mini-cell {
-    width: var(--mini-cell, 18px);
-    height: var(--mini-cell, 18px);
-    border-radius: 3px;
+    width: var(--mini-cell, 12px);
+    height: var(--mini-cell, 12px);
+    border-radius: 2px;
     background: rgba(255,255,255,0.03);
   }
 
@@ -193,22 +196,26 @@
     box-shadow:
       var(--glow),
       inset 0 0 60px rgba(0, 0, 0, 0.4);
+    flex: 1 1 0;
+    display: flex;
+    min-width: 0;
   }
 
   .board {
     display: grid;
-    grid-template-columns: repeat(var(--cols), var(--cell));
-    grid-template-rows: repeat(var(--rows), var(--cell));
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
     gap: 1px;
     background: rgba(255, 255, 255, 0.02);
     border-radius: 8px;
     overflow: hidden;
     position: relative;
+    flex: 1 1 0;
   }
 
   .cell {
-    width: var(--cell);
-    height: var(--cell);
+    width: 100%;
+    aspect-ratio: 1;
     background: rgba(255, 255, 255, 0.015);
     border-radius: 2px;
     transition: background 0.08s, box-shadow 0.08s;
@@ -323,27 +330,17 @@
   /* --- Mobile Controls --- */
   .mobile-controls {
     display: none;
-    gap: 10px;
+    gap: var(--ctrl-gap);
     margin-top: 6px;
     z-index: 2;
     width: 100%;
     max-width: 320px;
   }
 
-  .ctrl-row {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .ctrl-row.ctrl-top {
-    justify-content: space-between;
-  }
-
-  .ctrl-row.ctrl-top .ctrl-group {
-    display: flex;
-    gap: 10px;
+  .ctrl-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--ctrl-gap);
   }
 
   .ctrl-btn {
@@ -383,7 +380,7 @@
   .ctrl-btn.accent-btn svg { stroke: var(--accent); }
   .ctrl-btn.accent-btn:active { background: rgba(0, 255, 200, 0.2); }
 
-  .ctrl-spacer { width: 68px; }
+  .ctrl-spacer { visibility: hidden; }
 
   @media (max-width: 640px) or (pointer: coarse) {
     .mobile-controls { display: flex; flex-direction: column; align-items: center; }
@@ -464,8 +461,6 @@
 <canvas class="particles-canvas" id="particlesCanvas"></canvas>
 
 <div class="game-wrapper">
-  <div class="game-title">Tetris</div>
-
   <div class="game-container">
     <!-- Game Board -->
     <div class="board-wrapper">
@@ -520,22 +515,19 @@
 
   <!-- Mobile Controls -->
   <div class="mobile-controls">
-    <!-- 第一行：左侧旋转+暂停，右侧硬降 -->
-    <div class="ctrl-row ctrl-top">
-      <div class="ctrl-group">
-        <div class="ctrl-btn" id="btnRotate">
-          <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-        </div>
-        <div class="ctrl-btn" id="btnPause">
-          <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-        </div>
+    <!-- 第一行：旋转、空白、暂停、硬降 -->
+    <div class="ctrl-grid">
+      <div class="ctrl-btn" id="btnRotate">
+        <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <div class="ctrl-btn" id="btnPause">
+        <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
       </div>
       <div class="ctrl-btn accent-btn" id="btnDrop">
         <svg viewBox="0 0 24 24"><path d="M12 3v14"/><path d="M5 14l7 7 7-7"/></svg>
       </div>
-    </div>
-    <!-- 第二行：方向键居中对齐屏幕底部 -->
-    <div class="ctrl-row">
+      <!-- 第二行：左、下、右、空白 -->
       <div class="ctrl-btn" id="btnLeft">
         <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
       </div>
@@ -545,6 +537,7 @@
       <div class="ctrl-btn" id="btnRight">
         <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
       </div>
+      <div class="ctrl-spacer"></div>
     </div>
   </div>
 
@@ -1130,7 +1123,7 @@
 
     // Total vertical space needed: title + board(20*cell + 19*1gap) + board-pad*2 + controls + gaps
     // Estimate non-board height: title(~2rem) + gaps(~50px) + controls(~160px) + board-pad(10px)
-    const nonBoardHeight = 240;
+    const nonBoardHeight = 210;
     const availableForBoard = window.innerHeight - nonBoardHeight;
     const boardInner = availableForBoard - 10; // board-pad * 2
     const maxCell = Math.floor(boardInner / 20.5); // 20 rows + 19 gaps of 1px
