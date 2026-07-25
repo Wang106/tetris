@@ -183,8 +183,8 @@
 
   .next-preview {
     display: grid;
-    grid-template-columns: repeat(4, var(--mini-cell, 12px));
-    grid-template-rows: repeat(4, var(--mini-cell, 12px));
+    grid-template-columns: repeat(3, var(--mini-cell, 12px));
+    grid-template-rows: repeat(3, var(--mini-cell, 12px));
     gap: 1px;
     margin: 0 auto;
     width: fit-content;
@@ -195,6 +195,12 @@
     height: var(--mini-cell, 12px);
     border-radius: 2px;
     background: rgba(255,255,255,0.03);
+  }
+
+  /* I-piece 预览用 4x2 布局 */
+  .next-preview.preview-i {
+    grid-template-columns: repeat(4, var(--mini-cell, 12px));
+    grid-template-rows: repeat(2, var(--mini-cell, 12px));
   }
 
   /* --- Game Board --- */
@@ -532,8 +538,11 @@
 
   <!-- Mobile Controls -->
   <div class="mobile-controls">
-    <!-- 第一行：旋转、空白、暂停、硬降 -->
+    <!-- 第一行：空格、旋转、空格、暂停 -->
+    <!-- 第二行：向左、空格、向右、空格 -->
+    <!-- 第三行：空格、向下、空格、快速向下 -->
     <div class="ctrl-grid">
+      <div class="ctrl-spacer"></div>
       <div class="ctrl-btn" id="btnRotate">
         <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
       </div>
@@ -541,20 +550,24 @@
       <div class="ctrl-btn" id="btnPause">
         <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
       </div>
-      <div class="ctrl-btn accent-btn" id="btnDrop">
-        <svg viewBox="0 0 24 24"><path d="M12 3v14"/><path d="M5 14l7 7 7-7"/></svg>
-      </div>
-      <!-- 第二行：左、下、右、空白 -->
+
       <div class="ctrl-btn" id="btnLeft">
         <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
       </div>
-      <div class="ctrl-btn" id="btnDown" style="margin-top: calc(var(--ctrl-size) / 2);">
-        <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-      </div>
+      <div class="ctrl-spacer"></div>
       <div class="ctrl-btn" id="btnRight">
         <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
       </div>
       <div class="ctrl-spacer"></div>
+
+      <div class="ctrl-spacer"></div>
+      <div class="ctrl-btn" id="btnDown">
+        <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="ctrl-spacer"></div>
+      <div class="ctrl-btn accent-btn" id="btnDrop">
+        <svg viewBox="0 0 24 24"><path d="M12 3v14"/><path d="M5 14l7 7 7-7"/></svg>
+      </div>
     </div>
   </div>
 
@@ -631,9 +644,9 @@
         cells[r][c] = cell;
       }
     }
-    // Next preview
+    // Next preview (9 cells for 3x3 grid)
     nextEl.innerHTML = '';
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 9; i++) {
       const mc = document.createElement('div');
       mc.className = 'mini-cell';
       nextEl.appendChild(mc);
@@ -838,31 +851,67 @@
 
   function renderNext() {
     const miniCells = nextEl.children;
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < miniCells.length; i++) {
       miniCells[i].className = 'mini-cell';
       miniCells[i].removeAttribute('data-piece');
       miniCells[i].style.background = '';
       miniCells[i].style.borderRadius = '';
       miniCells[i].style.boxShadow = '';
     }
+    nextEl.classList.remove('preview-i');
+
     if (nextPiece) {
-      const shape = PIECES[nextPiece].shape;
-      const color = PIECES[nextPiece].color;
-      const offsetR = shape.length === 2 ? 1 : 0;
-      const offsetC = shape[0].length === 2 ? 1 : 0;
-      for (let r = 0; r < shape.length; r++) {
-        for (let c = 0; c < shape[r].length; c++) {
-          if (shape[r][c]) {
-            const idx = (r + offsetR) * 4 + (c + offsetC);
-            miniCells[idx].classList.add('filled');
-            miniCells[idx].setAttribute('data-piece', color);
-            miniCells[idx].style.background = getComputedStyle(document.documentElement).getPropertyValue('--' + color).trim() ||
-              miniCells[idx].style.background;
-            // Use color directly
-            const colors = { I:'#00e5ff', O:'#ffd600', T:'#d500f9', S:'#00e676', Z:'#ff1744', J:'#2979ff', L:'#ff9100' };
-            miniCells[idx].style.background = colors[color] || '#fff';
-            miniCells[idx].style.borderRadius = '3px';
-            miniCells[idx].style.boxShadow = `0 0 6px ${colors[color]}66`;
+      const colors = { I:'#00e5ff', O:'#ffd600', T:'#d500f9', S:'#00e676', Z:'#ff1744', J:'#2979ff', L:'#ff9100' };
+      const color = colors[nextPiece] || '#fff';
+
+      if (nextPiece === 'I') {
+        // I-piece: rebuild as 4x2
+        nextEl.classList.add('preview-i');
+        nextEl.innerHTML = '';
+        for (let i = 0; i < 8; i++) {
+          const mc = document.createElement('div');
+          mc.className = 'mini-cell';
+          nextEl.appendChild(mc);
+        }
+        // I shape: row 1 all filled
+        for (let c = 0; c < 4; c++) {
+          const mc = nextEl.children[c];
+          mc.classList.add('filled');
+          mc.style.background = color;
+          mc.style.borderRadius = '2px';
+          mc.style.boxShadow = '0 0 4px ' + color + '66';
+        }
+      } else {
+        // All other pieces: fit into 3x3 grid
+        // Extract the 3x3 portion of the shape (skip empty rows/cols)
+        const shape = PIECES[nextPiece].shape;
+        // Find bounding box of filled cells
+        let minR = shape.length, maxR = 0, minC = shape[0].length, maxC = 0;
+        for (let r = 0; r < shape.length; r++) {
+          for (let c = 0; c < shape[r].length; c++) {
+            if (shape[r][c]) {
+              minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+              minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+            }
+          }
+        }
+        // Center in 3x3
+        const h = maxR - minR + 1;
+        const w = maxC - minC + 1;
+        const offR = Math.floor((3 - h) / 2);
+        const offC = Math.floor((3 - w) / 2);
+        for (let r = minR; r <= maxR; r++) {
+          for (let c = minC; c <= maxC; c++) {
+            if (shape[r][c]) {
+              const idx = (r - minR + offR) * 3 + (c - minC + offC);
+              if (idx >= 0 && idx < 9) {
+                const mc = nextEl.children[idx];
+                mc.classList.add('filled');
+                mc.style.background = color;
+                mc.style.borderRadius = '2px';
+                mc.style.boxShadow = '0 0 4px ' + color + '66';
+              }
+            }
           }
         }
       }
