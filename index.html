@@ -197,12 +197,6 @@
     background: rgba(255,255,255,0.03);
   }
 
-  /* I-piece 预览用 4x2 布局 */
-  .next-preview.preview-i {
-    grid-template-columns: repeat(4, var(--mini-cell, 12px));
-    grid-template-rows: repeat(2, var(--mini-cell, 12px));
-  }
-
   /* --- Game Board --- */
   .board-wrapper {
     position: relative;
@@ -850,66 +844,65 @@
   }
 
   function renderNext() {
+    // Ensure we have exactly 9 cells for 3x3 grid
+    while (nextEl.children.length < 9) {
+      const mc = document.createElement('div');
+      mc.className = 'mini-cell';
+      nextEl.appendChild(mc);
+    }
+    while (nextEl.children.length > 9) {
+      nextEl.removeChild(nextEl.lastChild);
+    }
+
     const miniCells = nextEl.children;
-    for (let i = 0; i < miniCells.length; i++) {
+    for (let i = 0; i < 9; i++) {
       miniCells[i].className = 'mini-cell';
-      miniCells[i].removeAttribute('data-piece');
       miniCells[i].style.background = '';
       miniCells[i].style.borderRadius = '';
       miniCells[i].style.boxShadow = '';
     }
-    nextEl.classList.remove('preview-i');
 
     if (nextPiece) {
       const colors = { I:'#00e5ff', O:'#ffd600', T:'#d500f9', S:'#00e676', Z:'#ff1744', J:'#2979ff', L:'#ff9100' };
       const color = colors[nextPiece] || '#fff';
 
-      if (nextPiece === 'I') {
-        // I-piece: rebuild as 4x2
-        nextEl.classList.add('preview-i');
-        nextEl.innerHTML = '';
-        for (let i = 0; i < 8; i++) {
-          const mc = document.createElement('div');
-          mc.className = 'mini-cell';
-          nextEl.appendChild(mc);
+      const shape = PIECES[nextPiece].shape;
+      // Find bounding box of filled cells
+      let minR = shape.length, maxR = 0, minC = shape[0].length, maxC = 0;
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c]) {
+            minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+            minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+          }
         }
-        // I shape: row 1 all filled
-        for (let c = 0; c < 4; c++) {
-          const mc = nextEl.children[c];
+      }
+      const h = maxR - minR + 1;
+      const w = maxC - minC + 1;
+      // For I-piece: show vertical 3 cells (bottom 3 of the 4-long bar)
+      let cols = 3, rows = 3;
+      let offR = 0, offC = 0;
+      if (nextPiece === 'I') {
+        // Show 3 vertical cells centered in 3x3
+        for (let r = 0; r < 3; r++) {
+          const mc = miniCells[r * 3 + 1];
           mc.classList.add('filled');
           mc.style.background = color;
           mc.style.borderRadius = '2px';
-          mc.style.boxShadow = '0 0 4px ' + color + '66';
+          mc.style.boxShadow = '0 0 3px ' + color + '55';
         }
       } else {
-        // All other pieces: fit into 3x3 grid
-        // Extract the 3x3 portion of the shape (skip empty rows/cols)
-        const shape = PIECES[nextPiece].shape;
-        // Find bounding box of filled cells
-        let minR = shape.length, maxR = 0, minC = shape[0].length, maxC = 0;
-        for (let r = 0; r < shape.length; r++) {
-          for (let c = 0; c < shape[r].length; c++) {
-            if (shape[r][c]) {
-              minR = Math.min(minR, r); maxR = Math.max(maxR, r);
-              minC = Math.min(minC, c); maxC = Math.max(maxC, c);
-            }
-          }
-        }
-        // Center in 3x3
-        const h = maxR - minR + 1;
-        const w = maxC - minC + 1;
-        const offR = Math.floor((3 - h) / 2);
-        const offC = Math.floor((3 - w) / 2);
+        offR = Math.floor((3 - h) / 2);
+        offC = Math.floor((3 - w) / 2);
         for (let r = minR; r <= maxR; r++) {
           for (let c = minC; c <= maxC; c++) {
             if (shape[r][c]) {
               const idx = (r - minR + offR) * 3 + (c - minC + offC);
               if (idx >= 0 && idx < 9) {
-                const mc = nextEl.children[idx];
-                mc.classList.add('filled');
-                mc.style.background = color;
-                mc.style.borderRadius = '2px';
-                mc.style.boxShadow = '0 0 4px ' + color + '66';
+                miniCells[idx].classList.add('filled');
+                miniCells[idx].style.background = color;
+                miniCells[idx].style.borderRadius = '2px';
+                miniCells[idx].style.boxShadow = '0 0 3px ' + color + '55';
               }
             }
           }
