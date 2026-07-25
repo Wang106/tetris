@@ -22,10 +22,39 @@
     --cell: 28px;
     --cols: 10;
     --rows: 20;
+    --game-gap: 16px;
+    --board-pad: 8px;
+    --panel-w: 110px;
+    --panel-pad: 12px;
+    --title-size: clamp(1.6rem, 5vw, 2.4rem);
+    --ctrl-size: 56px;
+    --ctrl-gap: 8px;
   }
 
-  @media (max-width: 520px) {
-    :root { --cell: 22px; }
+  @media (max-width: 640px) or (pointer: coarse) {
+    :root {
+      --cell: 2.4vh;
+      --game-gap: 6px;
+      --board-pad: 5px;
+      --panel-w: 56px;
+      --panel-pad: 5px;
+      --title-size: clamp(1rem, 3.5vw, 1.5rem);
+      --ctrl-size: 48px;
+      --ctrl-gap: 6px;
+      --mini-cell: 2.4vh;
+      --panel-val-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 380px) {
+    :root {
+      --cell: 2.1vh;
+      --panel-w: 46px;
+      --ctrl-size: 42px;
+      --ctrl-gap: 4px;
+      --mini-cell: 2.1vh;
+      --panel-val-size: 0.8rem;
+    }
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,7 +63,8 @@
     background: var(--bg);
     color: var(--fg);
     font-family: 'Noto Sans SC', sans-serif;
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -74,13 +104,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: var(--game-gap);
   }
 
   .game-title {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-size: var(--title-size);
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: transparent;
@@ -99,7 +129,7 @@
 
   .game-container {
     display: flex;
-    gap: 16px;
+    gap: var(--game-gap);
     align-items: flex-start;
   }
 
@@ -107,15 +137,15 @@
   .side-panel {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    width: 110px;
+    gap: 6px;
+    width: var(--panel-w);
   }
 
   .panel-box {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 12px;
+    padding: var(--panel-pad);
     backdrop-filter: blur(10px);
     box-shadow: var(--glow);
   }
@@ -127,28 +157,28 @@
     letter-spacing: 0.15em;
     color: var(--muted);
     text-transform: uppercase;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   .panel-value {
     font-family: 'Orbitron', monospace;
-    font-size: 1.3rem;
+    font-size: var(--panel-val-size, 1.3rem);
     font-weight: 900;
     color: var(--accent);
   }
 
   .next-preview {
     display: grid;
-    grid-template-columns: repeat(4, 18px);
-    grid-template-rows: repeat(4, 18px);
+    grid-template-columns: repeat(4, var(--mini-cell, 18px));
+    grid-template-rows: repeat(4, var(--mini-cell, 18px));
     gap: 2px;
     margin: 0 auto;
     width: fit-content;
   }
 
   .next-preview .mini-cell {
-    width: 18px;
-    height: 18px;
+    width: var(--mini-cell, 18px);
+    height: var(--mini-cell, 18px);
     border-radius: 3px;
     background: rgba(255,255,255,0.03);
   }
@@ -159,7 +189,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 8px;
+    padding: var(--board-pad);
     box-shadow:
       var(--glow),
       inset 0 0 60px rgba(0, 0, 0, 0.4);
@@ -293,22 +323,22 @@
   /* --- Mobile Controls --- */
   .mobile-controls {
     display: none;
-    gap: 8px;
-    margin-top: 12px;
+    gap: var(--ctrl-gap);
+    margin-top: 6px;
     z-index: 2;
   }
 
   .ctrl-row {
     display: flex;
-    gap: 12px;
+    gap: var(--ctrl-gap);
     justify-content: center;
   }
 
   .ctrl-btn {
-    width: 72px;
-    height: 72px;
+    width: var(--ctrl-size);
+    height: var(--ctrl-size);
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: 14px;
     background: var(--card);
     color: var(--fg);
     font-size: 1.3rem;
@@ -341,16 +371,10 @@
   .ctrl-btn.accent-btn svg { stroke: var(--accent); }
   .ctrl-btn.accent-btn:active { background: rgba(0, 255, 200, 0.2); }
 
-  .ctrl-spacer { width: 72px; }
+  .ctrl-spacer { width: var(--ctrl-size); }
 
   @media (max-width: 640px) or (pointer: coarse) {
     .mobile-controls { display: flex; flex-direction: column; align-items: center; }
-    .side-panel { width: 80px; }
-    .side-panel .panel-box { padding: 8px; }
-    .panel-value { font-size: 1rem; }
-    .panel-label { font-size: 0.5rem; }
-    .next-preview { grid-template-columns: repeat(4, 14px); grid-template-rows: repeat(4, 14px); gap: 1px; }
-    .next-preview .mini-cell { width: 14px; height: 14px; }
   }
 
   /* --- Particle Effects --- */
@@ -1087,6 +1111,27 @@
   // CSS-level touch-action on body for broad gesture blocking
   document.body.style.touchAction = 'manipulation';
   document.body.style.msTouchAction = 'manipulation';
+
+  // Dynamic cell sizing based on available viewport height (mobile-friendly)
+  function fitBoardToScreen() {
+    const isMobile = window.innerWidth <= 640 || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+    if (!isMobile) return;
+
+    // Total vertical space needed: title + board(20*cell + 19*1gap) + board-pad*2 + controls + gaps
+    // Estimate non-board height: title(~2rem) + gaps(~50px) + controls(~160px) + board-pad(10px)
+    const nonBoardHeight = 240;
+    const availableForBoard = window.innerHeight - nonBoardHeight;
+    const boardInner = availableForBoard - 10; // board-pad * 2
+    const maxCell = Math.floor(boardInner / 20.5); // 20 rows + 19 gaps of 1px
+    const clampedCell = Math.max(12, Math.min(30, maxCell)); // clamp between 12-30px
+
+    document.documentElement.style.setProperty('--cell', clampedCell + 'px');
+    document.documentElement.style.setProperty('--mini-cell', clampedCell + 'px');
+  }
+
+  fitBoardToScreen();
+  window.addEventListener('resize', fitBoardToScreen);
+  window.addEventListener('orientationchange', () => setTimeout(fitBoardToScreen, 100));
 
   // Init
   createBoard();
