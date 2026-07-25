@@ -323,22 +323,34 @@
   /* --- Mobile Controls --- */
   .mobile-controls {
     display: none;
-    gap: var(--ctrl-gap);
+    gap: 10px;
     margin-top: 6px;
     z-index: 2;
+    width: 100%;
+    max-width: 320px;
   }
 
   .ctrl-row {
     display: flex;
-    gap: var(--ctrl-gap);
+    gap: 10px;
     justify-content: center;
+    align-items: center;
+  }
+
+  .ctrl-row.ctrl-top {
+    justify-content: space-between;
+  }
+
+  .ctrl-row.ctrl-top .ctrl-group {
+    display: flex;
+    gap: 10px;
   }
 
   .ctrl-btn {
-    width: var(--ctrl-size);
-    height: var(--ctrl-size);
+    width: 68px;
+    height: 68px;
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: 16px;
     background: var(--card);
     color: var(--fg);
     font-size: 1.3rem;
@@ -359,8 +371,8 @@
   }
 
   .ctrl-btn svg {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     fill: none;
     stroke: var(--fg);
     stroke-width: 2.5;
@@ -371,7 +383,7 @@
   .ctrl-btn.accent-btn svg { stroke: var(--accent); }
   .ctrl-btn.accent-btn:active { background: rgba(0, 255, 200, 0.2); }
 
-  .ctrl-spacer { width: var(--ctrl-size); }
+  .ctrl-spacer { width: 68px; }
 
   @media (max-width: 640px) or (pointer: coarse) {
     .mobile-controls { display: flex; flex-direction: column; align-items: center; }
@@ -508,15 +520,21 @@
 
   <!-- Mobile Controls -->
   <div class="mobile-controls">
-    <div class="ctrl-row">
-      <div class="ctrl-btn" id="btnRotate">
-        <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    <!-- 第一行：左侧旋转+暂停，右侧硬降 -->
+    <div class="ctrl-row ctrl-top">
+      <div class="ctrl-group">
+        <div class="ctrl-btn" id="btnRotate">
+          <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        </div>
+        <div class="ctrl-btn" id="btnPause">
+          <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        </div>
       </div>
-      <div class="ctrl-spacer"></div>
-      <div class="ctrl-btn" id="btnPause">
-        <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+      <div class="ctrl-btn accent-btn" id="btnDrop">
+        <svg viewBox="0 0 24 24"><path d="M12 3v14"/><path d="M5 14l7 7 7-7"/></svg>
       </div>
     </div>
+    <!-- 第二行：方向键居中对齐屏幕底部 -->
     <div class="ctrl-row">
       <div class="ctrl-btn" id="btnLeft">
         <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -527,13 +545,6 @@
       <div class="ctrl-btn" id="btnRight">
         <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
       </div>
-    </div>
-    <div class="ctrl-row">
-      <div class="ctrl-btn accent-btn" id="btnDrop">
-        <svg viewBox="0 0 24 24"><path d="M12 3v14"/><path d="M5 14l7 7 7-7"/></svg>
-      </div>
-      <div class="ctrl-spacer"></div>
-      <div class="ctrl-spacer"></div>
     </div>
   </div>
 
