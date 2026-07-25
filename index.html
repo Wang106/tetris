@@ -2,7 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 <title>俄罗斯方块</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
@@ -1061,10 +1063,30 @@
   }
   animateParticles();
 
-  // Prevent scroll on mobile
+  // Prevent scroll, zoom, and gestures on mobile
+  let lastTouchEnd = 0;
   document.addEventListener('touchmove', (e) => {
     if (gameRunning) e.preventDefault();
   }, { passive: false });
+
+  // Block double-tap zoom
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+
+  // Block pinch zoom and gesture scaling
+  document.addEventListener('gesturestart', (e) => e.preventDefault());
+  document.addEventListener('gesturechange', (e) => e.preventDefault());
+  document.addEventListener('gestureend', (e) => e.preventDefault());
+
+  // Prevent context menu on long press
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // CSS-level touch-action on body for broad gesture blocking
+  document.body.style.touchAction = 'manipulation';
+  document.body.style.msTouchAction = 'manipulation';
 
   // Init
   createBoard();
