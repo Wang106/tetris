@@ -41,7 +41,7 @@
       --title-size: clamp(1rem, 3.5vw, 1.5rem);
       --ctrl-size: 48px;
       --ctrl-gap: 6px;
-      --mini-cell: 10px;
+      --mini-cell: 7px;
       --panel-val-size: 0.9rem;
     }
   }
@@ -52,7 +52,7 @@
       --panel-w: 46px;
       --ctrl-size: 42px;
       --ctrl-gap: 4px;
-      --mini-cell: 8px;
+      --mini-cell: 6px;
       --panel-val-size: 0.8rem;
     }
   }
@@ -112,7 +112,7 @@
     width: 100%;
     height: 100%;
     height: 100dvh;
-    padding: var(--game-gap);
+    padding: 18px;
     box-sizing: border-box;
   }
 
@@ -144,6 +144,7 @@
     width: 100%;
     max-width: 480px;
     min-height: 0;
+    max-height: 100%;
   }
 
   /* --- Side Panels --- */
@@ -208,7 +209,11 @@
       inset 0 0 60px rgba(0, 0, 0, 0.4);
     flex: 1 1 0;
     display: flex;
+    flex-direction: column;
     min-width: 0;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
   }
 
   .board {
@@ -221,11 +226,13 @@
     overflow: hidden;
     position: relative;
     flex: 1 1 0;
+    min-height: 0;
+    max-height: 100%;
   }
 
   .cell {
     width: 100%;
-    aspect-ratio: 1;
+    height: 100%;
     background: rgba(255, 255, 255, 0.015);
     border-radius: 2px;
     transition: background 0.08s, box-shadow 0.08s;
@@ -834,6 +841,9 @@
     for (let i = 0; i < 16; i++) {
       miniCells[i].className = 'mini-cell';
       miniCells[i].removeAttribute('data-piece');
+      miniCells[i].style.background = '';
+      miniCells[i].style.borderRadius = '';
+      miniCells[i].style.boxShadow = '';
     }
     if (nextPiece) {
       const shape = PIECES[nextPiece].shape;
