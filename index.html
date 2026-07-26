@@ -207,6 +207,16 @@
     color: var(--accent);
   }
 
+  /* Center the NEXT preview inside its panel box */
+  .panel-box.next-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .panel-box.next-box .panel-label {
+    width: 100%;
+  }
+
   .next-preview {
     display: grid;
     grid-template-columns: repeat(4, var(--mini-cell, 12px));
@@ -533,7 +543,7 @@
 
     <!-- Right Panel (all info) -->
     <div class="side-panel">
-      <div class="panel-box">
+      <div class="panel-box next-box">
         <div class="panel-label">Next</div>
         <div class="next-preview" id="nextPreview"></div>
       </div>
