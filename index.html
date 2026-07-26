@@ -29,6 +29,7 @@
     --title-size: clamp(1.6rem, 5vw, 2.4rem);
     --ctrl-size: 56px;
     --ctrl-gap: 8px;
+    --mini-cell: calc(var(--cell) / 2);
   }
 
   @media (max-width: 640px) or (pointer: coarse) {
@@ -41,7 +42,7 @@
       --title-size: clamp(1rem, 3.5vw, 1.5rem);
       --ctrl-size: 48px;
       --ctrl-gap: 6px;
-      --mini-cell: 7px;
+      --mini-cell: calc(var(--cell) / 2);
       --panel-val-size: 0.9rem;
     }
   }
@@ -52,12 +53,31 @@
       --panel-w: 46px;
       --ctrl-size: 42px;
       --ctrl-gap: 4px;
-      --mini-cell: 6px;
+      --mini-cell: calc(var(--cell) / 2);
       --panel-val-size: 0.8rem;
     }
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  ::selection {
+    background: transparent;
+    color: inherit;
+  }
+
+  ::-moz-selection {
+    background: transparent;
+    color: inherit;
+  }
 
   html, body {
     width: 100%;
@@ -75,6 +95,12 @@
     align-items: center;
     overflow: hidden;
     position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* --- Background Effects --- */
@@ -183,8 +209,8 @@
 
   .next-preview {
     display: grid;
-    grid-template-columns: repeat(3, var(--mini-cell, 12px));
-    grid-template-rows: repeat(3, var(--mini-cell, 12px));
+    grid-template-columns: repeat(4, var(--mini-cell, 12px));
+    grid-template-rows: repeat(4, var(--mini-cell, 12px));
     gap: 1px;
     margin: 0 auto;
     width: fit-content;
@@ -638,9 +664,9 @@
         cells[r][c] = cell;
       }
     }
-    // Next preview (9 cells for 3x3 grid)
+    // Next preview (16 cells for 4x4 grid)
     nextEl.innerHTML = '';
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 16; i++) {
       const mc = document.createElement('div');
       mc.className = 'mini-cell';
       nextEl.appendChild(mc);
@@ -844,18 +870,18 @@
   }
 
   function renderNext() {
-    // Ensure we have exactly 9 cells for 3x3 grid
-    while (nextEl.children.length < 9) {
+    // Ensure we have exactly 16 cells for 4x4 grid
+    while (nextEl.children.length < 16) {
       const mc = document.createElement('div');
       mc.className = 'mini-cell';
       nextEl.appendChild(mc);
     }
-    while (nextEl.children.length > 9) {
+    while (nextEl.children.length > 16) {
       nextEl.removeChild(nextEl.lastChild);
     }
 
     const miniCells = nextEl.children;
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 16; i++) {
       miniCells[i].className = 'mini-cell';
       miniCells[i].style.background = '';
       miniCells[i].style.borderRadius = '';
@@ -879,31 +905,18 @@
       }
       const h = maxR - minR + 1;
       const w = maxC - minC + 1;
-      // For I-piece: show vertical 3 cells (bottom 3 of the 4-long bar)
-      let cols = 3, rows = 3;
-      let offR = 0, offC = 0;
-      if (nextPiece === 'I') {
-        // Show 3 vertical cells centered in 3x3
-        for (let r = 0; r < 3; r++) {
-          const mc = miniCells[r * 3 + 1];
-          mc.classList.add('filled');
-          mc.style.background = color;
-          mc.style.borderRadius = '2px';
-          mc.style.boxShadow = '0 0 3px ' + color + '55';
-        }
-      } else {
-        offR = Math.floor((3 - h) / 2);
-        offC = Math.floor((3 - w) / 2);
-        for (let r = minR; r <= maxR; r++) {
-          for (let c = minC; c <= maxC; c++) {
-            if (shape[r][c]) {
-              const idx = (r - minR + offR) * 3 + (c - minC + offC);
-              if (idx >= 0 && idx < 9) {
-                miniCells[idx].classList.add('filled');
-                miniCells[idx].style.background = color;
-                miniCells[idx].style.borderRadius = '2px';
-                miniCells[idx].style.boxShadow = '0 0 3px ' + color + '55';
-              }
+      // Center the piece in 4x4 grid
+      const offR = Math.floor((4 - h) / 2);
+      const offC = Math.floor((4 - w) / 2);
+      for (let r = minR; r <= maxR; r++) {
+        for (let c = minC; c <= maxC; c++) {
+          if (shape[r][c]) {
+            const idx = (r - minR + offR) * 4 + (c - minC + offC);
+            if (idx >= 0 && idx < 16) {
+              miniCells[idx].classList.add('filled');
+              miniCells[idx].style.background = color;
+              miniCells[idx].style.borderRadius = '2px';
+              miniCells[idx].style.boxShadow = '0 0 3px ' + color + '55';
             }
           }
         }
@@ -1192,7 +1205,7 @@
     const clampedCell = Math.max(12, Math.min(30, maxCell)); // clamp between 12-30px
 
     document.documentElement.style.setProperty('--cell', clampedCell + 'px');
-    document.documentElement.style.setProperty('--mini-cell', clampedCell + 'px');
+    document.documentElement.style.setProperty('--mini-cell', (clampedCell / 2) + 'px');
   }
 
   fitBoardToScreen();
