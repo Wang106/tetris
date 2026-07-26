@@ -1077,10 +1077,17 @@
     }
   });
 
+  // --- Vibration Helper ---
+  function vibrate(pattern = 10) {
+    if (navigator.vibrate) {
+      try { navigator.vibrate(pattern); } catch (e) {}
+    }
+  }
+
   // --- Buttons ---
-  document.getElementById('startBtn').addEventListener('click', startGame);
-  document.getElementById('resumeBtn').addEventListener('click', togglePause);
-  document.getElementById('restartBtn').addEventListener('click', startGame);
+  document.getElementById('startBtn').addEventListener('click', () => { vibrate(15); startGame(); });
+  document.getElementById('resumeBtn').addEventListener('click', () => { vibrate(15); togglePause(); });
+  document.getElementById('restartBtn').addEventListener('click', () => { vibrate(15); startGame(); });
 
   // Mobile controls
   let touchRepeat = null;
@@ -1089,6 +1096,7 @@
     const btn = document.getElementById(id);
     btn.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      vibrate(10);
       action();
       if (repeat) {
         touchRepeat = setInterval(action, 100);
@@ -1100,6 +1108,11 @@
     });
     btn.addEventListener('touchcancel', () => {
       if (touchRepeat) { clearInterval(touchRepeat); touchRepeat = null; }
+    });
+    // Support mouse click on desktop as well
+    btn.addEventListener('click', (e) => {
+      if (!e.detail || e.detail === 0) return; // ignore synthetic clicks
+      vibrate(10);
     });
   }
 
